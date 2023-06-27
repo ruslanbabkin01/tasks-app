@@ -1,18 +1,18 @@
-const express = require("express");
-const authRouter = express.Router();
-const auth = require("../middlewares/auth");
-const asyncHandler = require("express-async-handler");
-const AuthController = require("../controllers/AuthController");
+const express = require('express')
+const router = express.Router()
+const isLoggedIn = require('../middlewares/isLoggedIn')
+const ctrlAuth = require('../controllers/AuthController')
 
-// Реєстрація - збереження користувача в базі даних
-authRouter.post("/register", asyncHandler(AuthController.register));
+router.get('/', ctrlAuth.home)
 
-// Автентифікація - перевірка даних, що ввів користувач з тим що є в базі даних
-authRouter.post("/login", asyncHandler(AuthController.login));
+router.post('/login', ctrlAuth.login)
 
-// Авторизація - перевірка прав доступу-middleware(auth)
+router.get('/register', ctrlAuth.registerPage)
 
-// Логаут - вихід із системи
-authRouter.get("/logout", auth, asyncHandler(AuthController.logout));
+router.post('/register', ctrlAuth.register)
 
-module.exports = authRouter;
+router.get('/profile', isLoggedIn, ctrlAuth.profile)
+
+router.get('/logout', ctrlAuth.logout)
+
+module.exports = router

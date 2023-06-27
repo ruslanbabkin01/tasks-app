@@ -1,108 +1,65 @@
-const bcrypt = require('bcrypt')
-const generateToken = require('../../helpers/generateToken')
-
-const usersModel = require('../service/schemas/task')
-const rolesModel = require('../service/schemas/rolesModel')
+const passport = require('passport')
+const User = require('../service/schemas/user')
 
 class AuthController {
-  // Реєстрація - збереження користувача в базі даних
-  register = async (req, res, next) => {
-    // отримуємо дані від користувача і валідуємо
-    const { password, email } = req.body
-
-    if (!password || !email) {
-      res.status(400)
-      throw new Error('Please, provide all required fields')
-    }
-
-    // перевіряємо чи є такий користувач в БД
-    const candidate = await usersModel.findOne({ email })
-
-    // якщо є - повідомляємо що такий користувач вже існує
-    if (candidate) {
-      res.status(400)
-      throw new Error('User already exists')
-    }
-
-    // якщо нема - хешуємо пароль
-    const hash = bcrypt.hashSync(password, 5)
-
-    // зберігаємо користувача в БД
-    const role = await rolesModel.findOne({ value: 'USER' })
-    const user = await usersModel.create({
-      ...req.body,
-      password: hash,
-    })
-
-    user.roles.push(role.value)
-    await user.save()
-
-    if (!user) {
-      res.status(400)
-      throw new Error('Unable to save user')
-    }
-
-    res.status(201).json({
-      code: 201,
-      message: 'success',
-      data: {
-        email: user.email,
-        name: user.name,
-        roles: user.roles,
-      },
-    })
+  home = async (req, res, next) => {
+    res.render('index', { message: req.flash('message') })
   }
 
-  // Автентифікація - перевірка даних, що ввів користувач з тим що є в базі даних
   login = async (req, res, next) => {
-    // отримуємо дані від користувача і валідуємо
-    const { password, email } = req.body
-
-    if (!password || !email) {
-      res.status(400)
-      throw new Error('Please, provide all required fields')
-    }
-    // шукаємо користувача в бд і перевіряємо пароль на валідність
-    const user = await usersModel.findOne({ email })
-    const correctPassword = bcrypt.compareSync(password, user.password)
-
-    // якщо не знайшли, чи не валідний пароль - кидаємо помилку
-    if (!user || !correctPassword) {
-      res.status(400)
-      throw new Error('Invalid email or password')
-    }
-    // якщо знайшли і валідний, то видаємо токен
-    const token = generateToken(user._id)
-    user.token = token
-    const isUpdatedToken = await user.save()
-    if (!isUpdatedToken) {
-      res.status(400)
-      throw new Error('Unable to set token')
-    }
-
-    res.status(200).json({
-      code: 200,
-      message: 'success',
-      data: {
-        email: user.email,
-        token: user.token,
-      },
-    })
+    passport.authenticate('local', (err, user) => {
+      if (err) {
+        return next(err)
+      }
+      if (!user) {
+        req.flash('message', 'Enter the correct username and password!')
+        return res.redirect('/api/auth')
+      }
+      req.logIn(user, function (err) {
+        if (err) {
+          return next(err)
+        }
+        return res.redirect('/api/auth/profile')
+      })
+    })(req, res, next)
   }
 
-  // Логаут - вихід із системи
-  logout = async (req, res, next) => {
-    const { _id } = req.user
-    const user = await usersModel.findByIdAndUpdate(_id, { token: null })
+  registerPage = async (req, res, next) => {
+    res.render('register', { message: req.flash('message') })
+  }
 
-    if (!user) {
-      res.status(400)
-      throw new Error('Unable to logout')
+  register = async (req, res, next) => {
+    const { username, email, password } = req.body
+    try {
+      //create user and enter data
+      const user = await User.findOne({ email })
+      // if user already exist send message
+      if (user) {
+        req.flash('message', 'User with this Email already exists')
+        return res.redirect('/api/auth')
+      }
+      const newUser = new User({ username, email })
+      newUser.setPassword(password)
+      //else added user in db
+      await newUser.save()
+      req.flash('message', 'You have successfully registered')
+      res.redirect('/api/auth/profile')
+    } catch (e) {
+      next(e)
     }
+  }
 
-    res.status(200).json({
-      code: 200,
-      message: 'logout success',
+  profile = async (req, res, next) => {
+    const { username, email } = req.user
+    res.render('profile', { username, email })
+  }
+
+  logout = async (req, res) => {
+    req.logout(function (err) {
+      if (err) {
+        return next(err)
+      }
+      res.redirect('/api/auth')
     })
   }
 }
