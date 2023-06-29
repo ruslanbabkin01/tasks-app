@@ -1,18 +1,18 @@
 const express = require('express')
 const router = express.Router()
 const ctrlTask = require('../controllers/TasksController')
-const isLoggedIn = require('../middlewares/isLoggedIn')
+const { isLoggedIn } = require('../middlewares')
 
 router.get('/', isLoggedIn, ctrlTask.get)
 
-router.get('/:id', isLoggedIn, ctrlTask.getById)
+router.get('/:id', ctrlTask.getById)
 
-router.post('/', isLoggedIn, ctrlTask.create)
+router.post('/', ctrlTask.create)
 
-router.put('/:id', isLoggedIn, ctrlTask.update)
+router.put('/:id', ctrlTask.update)
 
-router.patch('/:id/status', isLoggedIn, ctrlTask.updateStatus)
+router.patch('/:id/status', ctrlTask.updateStatus)
 
-router.delete('/:id', isLoggedIn, ctrlTask.remove)
+router.delete('/:id', ctrlTask.remove)
 
 module.exports = router
