@@ -7,9 +7,9 @@ const auth = (req, res, next) => {
         status: 'error',
         code: 401,
         message: 'Unauthorized',
-        data: 'Unauthorized',
       })
     }
+
     req.user = user
     next()
   })(req, res, next)

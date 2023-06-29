@@ -5,6 +5,7 @@ require('dotenv').config()
 class AuthController {
   register = async (req, res, next) => {
     const { username, email, password } = req.body
+
     const user = await User.findOne({ email })
     if (user) {
       return res.status(409).json({
@@ -30,6 +31,7 @@ class AuthController {
 
   login = async (req, res, next) => {
     const { email, password } = req.body
+
     const user = await User.findOne({ email })
 
     if (!user || !user.verifyPassword(password)) {
@@ -37,17 +39,16 @@ class AuthController {
         status: 'error',
         code: 400,
         message: 'Incorrect login or password',
-        data: 'Bad request',
       })
     }
 
     const payload = {
-      id: user.id,
+      id: user._id,
       username: user.username,
     }
 
-    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' })
-    res.json({
+    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1d' })
+    res.status(200).json({
       status: 'success',
       code: 200,
       token,
