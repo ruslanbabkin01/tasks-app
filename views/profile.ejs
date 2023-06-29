@@ -22,9 +22,9 @@
         <div class="inner">
           <h3 class="masthead-brand">Task App</h3>
           <nav class="nav nav-masthead justify-content-center">
-            <a class="nav-link" href="/api/auth">SigIn</a>
-            <a class="nav-link" href="/api/auth/register">Register</a>
-            <a class="nav-link active" href="/api/auth/profile">Profile</a>
+            <a class="nav-link" href="/">SigIn</a>
+            <a class="nav-link" href="/register">Register</a>
+            <a class="nav-link active" href="/profile">Profile</a>
           </nav>
         </div>
       </header>
@@ -43,13 +43,21 @@
               <span class="text-muted"><%= email %></span>
             </h5>
           </div>
-          <div class="col-md-5 order-md-1">
+
+          <!-- <div class="col-md-5 order-md-1">
             <img src="../public/images/ava.png" alt="avatar" width="250" />
-          </div>
+          </div> -->
+
+          <form action="/upload" enctype="multipart/form-data" method="post">
+            <div>Title: <input type="text" name="title" /></div>
+            <div>
+              File:
+              <input type="file" name="someExpressFiles" multiple="multiple" />
+            </div>
+            <input type="submit" value="Upload" />
+          </form>
         </div>
-        <a href="/api/auth/logout" class="btn btn-lg btn-primary btn-block"
-          >Log Out</a
-        >
+        <a href="/logout" class="btn btn-lg btn-primary btn-block">Log Out</a>
       </main>
     </div>
   </body>

@@ -22,15 +22,15 @@
         <div class="inner">
           <h3 class="masthead-brand">Task App</h3>
           <nav class="nav nav-masthead justify-content-center">
-            <a class="nav-link" href="/api/auth">SigIn</a>
-            <a class="nav-link active" href="/api/auth/register">Register</a>
-            <a class="nav-link" href="/api/auth/profile">Profile</a>
+            <a class="nav-link" href="/">SigIn</a>
+            <a class="nav-link active" href="/register">Register</a>
+            <a class="nav-link" href="/profile">Profile</a>
           </nav>
         </div>
       </header>
 
       <main role="main" class="inner cover">
-        <form action="/api/auth/register" class="form" method="POST">
+        <form action="/register" class="form" method="POST">
           <h1 class="h3 mb-3 font-weight-normal">Please registration</h1>
           <% if (message) { %>
           <h4><%= message %></h4>
