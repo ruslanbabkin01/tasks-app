@@ -1,7 +1,9 @@
-const authRoutes = require('./authRoutes')
-const tasksRoutes = require('./tasksRoutes')
+const authRenderRouter = require('./authRenderRouter')
+const authRouter = require('./authRouter')
+const tasksRouter = require('./tasksRouter')
 
 module.exports = {
-  authRoutes,
-  tasksRoutes,
+  authRenderRouter,
+  authRouter,
+  tasksRouter,
 }

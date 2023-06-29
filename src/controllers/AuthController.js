@@ -1,71 +1,56 @@
-const passport = require('passport')
 const User = require('../service/schemas/user')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 class AuthController {
-  home = async (req, res, next) => {
-    res.render('index', { message: req.flash('message') })
-  }
-
-  login = async (req, res, next) => {
-    passport.authenticate('local', (err, user) => {
-      if (err) {
-        return next(err)
-      }
-
-      if (!user) {
-        req.flash('message', 'Enter the correct username and password!')
-        return res.redirect('/')
-      }
-
-      req.logIn(user, function (err) {
-        if (err) {
-          return next(err)
-        }
-        return res.redirect('/profile')
-      })
-    })(req, res, next)
-  }
-
-  registerPage = async (req, res, next) => {
-    res.render('register', { message: req.flash('message') })
-  }
-
   register = async (req, res, next) => {
     const { username, email, password } = req.body
+    const user = await User.findOne({ email })
+    if (user) {
+      return res.status(409).json({
+        status: 'error',
+        code: 409,
+        message: 'Email is already in use',
+        data: 'Conflict',
+      })
+    }
     try {
-      //create user and enter data
-      const user = await User.findOne({ email })
-
-      // if user already exist send message
-      if (user) {
-        //  throw RequestError(409, 'Email in use')
-        req.flash('message', 'User with this Email already exists')
-        return res.redirect('/')
-      }
-
       const newUser = new User({ username, email })
       newUser.setPassword(password)
-
-      //else added user in db
       await newUser.save()
-      req.flash('message', 'You have successfully registered')
-      res.redirect('/profile')
-    } catch (e) {
-      next(e)
+      res.status(201).json({
+        status: 'success',
+        code: 201,
+        message: 'Registration successful',
+      })
+    } catch (error) {
+      next(error)
     }
   }
 
-  profile = async (req, res, next) => {
-    const { username, email } = req.user
-    res.render('profile', { username, email })
-  }
+  login = async (req, res, next) => {
+    const { email, password } = req.body
+    const user = await User.findOne({ email })
 
-  logout = async (req, res) => {
-    req.logout(function (err) {
-      if (err) {
-        return next(err)
-      }
-      res.redirect('/')
+    if (!user || !user.verifyPassword(password)) {
+      return res.status(400).json({
+        status: 'error',
+        code: 400,
+        message: 'Incorrect login or password',
+        data: 'Bad request',
+      })
+    }
+
+    const payload = {
+      id: user.id,
+      username: user.username,
+    }
+
+    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' })
+    res.json({
+      status: 'success',
+      code: 200,
+      token,
     })
   }
 }

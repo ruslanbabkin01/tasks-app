@@ -1,9 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const ctrlTask = require('../controllers/TasksController')
-const { isLoggedIn } = require('../middlewares')
+const { auth } = require('../middlewares')
 
-router.get('/', isLoggedIn, ctrlTask.get)
+router.get('/', auth, ctrlTask.get)
 
 router.get('/:id', ctrlTask.getById)
 

@@ -37,16 +37,18 @@ app.use(
   })
 )
 app.use(flash())
-require('./src/config/config-passport-local')
+// require('./src/config/config-passport-local')
+require('./src/config/config-passport-jwt')
 app.use(passport.initialize())
 app.use(passport.session())
 
 const { errorRoutesHandler, errorHandler } = require('./src/middlewares')
-const { tasksRoutes, authRoutes } = require('./src/routes')
+const { authRenderRouter, tasksRouter, authRouter } = require('./src/routes')
 
 //setRoutes
-app.use('/tasks', tasksRoutes)
-app.use('/', authRoutes)
+app.use('/', authRenderRouter)
+app.use('/auth', authRouter)
+app.use('/tasks', tasksRouter)
 
 app.use('*', errorRoutesHandler)
 app.use(errorHandler)

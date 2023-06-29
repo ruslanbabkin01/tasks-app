@@ -4,6 +4,9 @@ const User = require('../service/schemas/user')
 require('dotenv').config()
 const secret = process.env.SECRET_KEY
 
+// Якщо стратегія аутентифікації не спрацьовує - відправиться відповідь 401 Unauthorized (Неавторизований)
+// Стратегія JWT налаштована так, щоб читати JWT-токен із заголовка HTTP Authorization (авторизації) для кожного вхідного запиту
+
 const ExtractJWT = passportJWT.ExtractJwt
 const JwtStrategy = passportJWT.Strategy
 const params = {
@@ -11,6 +14,9 @@ const params = {
   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
 }
 
+// в payload знаходиться id користувача.Потім звертаємося до БД і шукаємо користувача з id і:
+// - або повертаємо об'єкт користувача
+// - або помилку якщо користувач не був знайдений
 passport.use(
   new JwtStrategy(params, function (jwt_payload, done) {
     User.findOne({ _id: jwt_payload.id }, function (err, user) {
@@ -20,23 +26,8 @@ passport.use(
       if (user) {
         return done(null, user)
       } else {
-        return done(null, false)
-        // or you could create a new account
+        return done(new Error('User not found'), false)
       }
     })
   })
 )
-
-// JWT Strategy
-// passport.use(
-//   new JwtStrategy(params, function (payload, done) {
-//     User.findOne({ _id: payload.id })
-//       .then(([user]) => {
-//         if (!user) {
-//           return done(new Error('User not found'))
-//         }
-//         return done(null, user)
-//       })
-//       .catch(err => done(err))
-//   })
-// )

@@ -3,6 +3,7 @@ const service = require('../service')
 
 class TasksController {
   get = async (req, res, next) => {
+    const { username } = req.user
     try {
       const results = await service.getAlltasks()
 
@@ -15,6 +16,7 @@ class TasksController {
         code: 200,
         status: 'success',
         data: results,
+        message: `Authorization was successful: ${username}`,
         qty: results.length,
       })
     } catch (e) {
