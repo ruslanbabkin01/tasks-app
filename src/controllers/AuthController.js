@@ -50,8 +50,24 @@ class AuthController {
     const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1d' })
     res.status(200).json({
       status: 'success',
+      message: 'Logged in successfully!',
       code: 200,
-      token,
+      data: {
+        token,
+        email,
+        username: user.username,
+      },
+    })
+  }
+
+  logout = async (req, res) => {
+    const { _id } = req.user
+    await User.findByIdAndUpdate(_id, { token: null })
+
+    res.status(204).json({
+      status: 'success',
+      message: 'Logout success',
+      code: 204,
     })
   }
 }

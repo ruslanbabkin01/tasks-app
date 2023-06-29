@@ -82,8 +82,6 @@ class AuthRenderController {
     // створюємо екземпляр formidable
     const form = formidable({ uploadDir, maxFileSize: 2 * 1024 * 1024 })
 
-    console.log(parseFrom)
-
     const { fields, files } = await parseFrom(form, req)
 
     // припускаємо, що ім'я поля з файлом дорівнює picture.Отримуємо шлях де знаходиться файл temporaryName і його оригінальне ім'я name

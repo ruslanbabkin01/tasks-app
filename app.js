@@ -23,24 +23,24 @@ app.use(cors())
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use(
-  session({
-    secret: 'secret-word',
-    key: 'session-key',
-    cookie: {
-      path: '/',
-      httpOnly: true,
-      maxAge: null,
-    },
-    saveUninitialized: false,
-    resave: false,
-  })
-)
-app.use(flash())
+// app.use(
+//   session({
+//     secret: 'secret-word',
+//     key: 'session-key',
+//     cookie: {
+//       path: '/',
+//       httpOnly: true,
+//       maxAge: null,
+//     },
+//     saveUninitialized: false,
+//     resave: false,
+//   })
+// )
+// app.use(flash())
 // require('./src/config/config-passport-local')
 require('./src/config/config-passport-jwt')
 app.use(passport.initialize())
-app.use(passport.session())
+// app.use(passport.session())
 
 const { errorRoutesHandler, errorHandler } = require('./src/middlewares')
 const { authRenderRouter, tasksRouter, authRouter } = require('./src/routes')

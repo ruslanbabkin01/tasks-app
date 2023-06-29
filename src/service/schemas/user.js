@@ -18,6 +18,10 @@ const userSchema = new Schema({
     type: String,
     required: [true, 'Password required'],
   },
+  token: {
+    type: String,
+    default: null,
+  },
 })
 
 userSchema.methods.setPassword = function (password) {
