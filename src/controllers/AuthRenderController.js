@@ -1,10 +1,9 @@
 const passport = require('passport')
 const User = require('../service/schemas/user')
-const { upload } = require('../middlewares')
 const formidable = require('formidable')
 const path = require('path')
+const { parseForm } = require('../helpers')
 const fs = require('fs').promises
-const parseFrom = require('../helpers')
 
 class AuthRenderController {
   home = async (req, res, next) => {
@@ -18,7 +17,7 @@ class AuthRenderController {
       }
 
       if (!user) {
-        req.flash('message', 'Enter the correct username and password!')
+        req.flash('message', 'Enter the correct name and password!')
         return res.redirect('/')
       }
 
@@ -36,7 +35,7 @@ class AuthRenderController {
   }
 
   register = async (req, res, next) => {
-    const { username, email, password } = req.body
+    const { name, email, password } = req.body
     try {
       //create user and enter data
       const user = await User.findOne({ email })
@@ -48,7 +47,7 @@ class AuthRenderController {
         return res.redirect('/')
       }
 
-      const newUser = new User({ username, email })
+      const newUser = new User({ name, email })
       newUser.setPassword(password)
 
       //else added user in db
@@ -61,8 +60,8 @@ class AuthRenderController {
   }
 
   profile = async (req, res, next) => {
-    const { username, email } = req.user
-    res.render('profile', { username, email })
+    const { name, email } = req.user
+    res.render('profile', { name, email })
   }
 
   logout = async (req, res) => {
@@ -81,22 +80,22 @@ class AuthRenderController {
 
     // створюємо екземпляр formidable
     const form = formidable({ uploadDir, maxFileSize: 2 * 1024 * 1024 })
+    const { fields, files } = await parseForm(form, req)
 
-    const { fields, files } = await parseFrom(form, req)
-
-    // припускаємо, що ім'я поля з файлом дорівнює picture.Отримуємо шлях де знаходиться файл temporaryName і його оригінальне ім'я name
-    const { path: temporaryName, name } = files.picture
+    // ім'я поля з файлом name=picture. Отримуємо шлях де знаходиться файл temporaryName і його ім'я name
+    const { filepath, originalFilename } = files.picture
     const { description } = fields
 
-    // даємо нове ім'я файлу, у нашому випадку залишаємо його тим самим
-    const fileName = path.join(storeImage, name)
+    // даємо нове ім'я файлу
+    const newFileName = `${+new Date()}_${originalFilename}`
+    const newFilePath = path.join(storeImage, newFileName)
 
     // переносимо файл у постійне сховище
     try {
-      await fs.rename(temporaryName, fileName)
+      await fs.rename(filepath, newFilePath)
     } catch (err) {
-      // Якщо сталася помилка перенесення - видаляємо тимчасовий файл
-      await fs.unlink(temporaryName)
+      // Якщо помилка перенесення - видаляємо тимчасовий файл
+      await fs.unlink(filepath)
       return next(err)
     }
 

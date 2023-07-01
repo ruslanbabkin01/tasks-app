@@ -35,8 +35,8 @@
             <p class="lead">Welcome to a secure page</p>
             <hr />
             <h5 class="featurette-heading text-left">
-              username:
-              <span class="text-muted"><%= username %></span>
+              Name:
+              <span class="text-muted"><%= name %></span>
             </h5>
             <h5 class="featurette-heading text-left">
               email:
@@ -44,15 +44,15 @@
             </h5>
           </div>
 
-          <!-- <div class="col-md-5 order-md-1">
-            <img src="../public/images/ava.png" alt="avatar" width="250" />
-          </div> -->
+          <div class="col-md-5 order-md-1">
+            <img src="../public/ava.png" alt="avatar" width="250" />
+          </div>
 
           <form action="/upload" enctype="multipart/form-data" method="post">
             <div>Title: <input type="text" name="title" /></div>
             <div>
               File:
-              <input type="file" name="someExpressFiles" multiple="multiple" />
+              <input type="file" name="picture" multiple="multiple" />
             </div>
             <input type="submit" value="Upload" />
           </form>

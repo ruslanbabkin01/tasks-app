@@ -4,7 +4,7 @@ require('dotenv').config()
 
 class AuthController {
   register = async (req, res, next) => {
-    const { username, email, password } = req.body
+    const { name, email, password } = req.body
 
     const user = await User.findOne({ email })
     if (user) {
@@ -16,7 +16,7 @@ class AuthController {
       })
     }
     try {
-      const newUser = new User({ username, email })
+      const newUser = new User({ name, email })
       newUser.setPassword(password)
       await newUser.save()
       res.status(201).json({
@@ -44,7 +44,7 @@ class AuthController {
 
     const payload = {
       id: user._id,
-      username: user.username,
+      name: user.name,
     }
 
     const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1d' })
@@ -55,7 +55,7 @@ class AuthController {
       data: {
         token,
         email,
-        username: user.username,
+        name: user.name,
       },
     })
   }

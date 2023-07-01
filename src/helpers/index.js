@@ -1,10 +1,10 @@
 const requestError = require('./requestError')
-const parseFrom = require('./parseFrom')
+const parseForm = require('./parseForm')
 const createFolderIsNotExist = require('./createFolderIsNotExist')
 const isAccessible = require('./isAccessible')
 
 module.exports = {
-  parseFrom,
+  parseForm,
   requestError,
   createFolderIsNotExist,
   isAccessible,
